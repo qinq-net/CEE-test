@@ -21,7 +21,7 @@
 #include "G4Colour.hh"
 //
 
-
+#include "CEEMaterials.hh"
 
 #include "T1T0.hh"
 
@@ -49,6 +49,9 @@ G4VPhysicalVolume* T1DetectorConstruction::Construct()
   G4Material* default_mat = nist->FindOrBuildMaterial("G4_Galactic");
   G4VisAttributes* default_Vis = new G4VisAttributes(G4Colour(0,0,0,0));
 
+  CEEMaterials *CEEMat = new CEEMaterials();
+  G4cout << *(G4Material::GetMaterialTable()) << std::endl;
+
   // Option to switch on/off checking of volumes overlaps
   //
   G4bool checkOverlaps = false;
@@ -70,7 +73,7 @@ G4VPhysicalVolume* T1DetectorConstruction::Construct()
   G4double CEE_Pix_py = 0*cm;
   G4double CEE_Pix_pz = -8*cm;
   G4ThreeVector CEE_Pix_p = G4ThreeVector(CEE_Pix_px, CEE_Pix_py, CEE_Pix_pz);
-  G4Material* CEE_Pix_mat = nist->FindOrBuildMaterial("G4_Galactic");//Ar:CO2 7:3
+  G4Material* CEE_Pix_mat = nist->FindOrBuildMaterial("CEEArCO2");//Ar:CO2 7:3
   G4VisAttributes* CEE_Pix_Vis = new G4VisAttributes(G4Colour(0.0,0.0,1.0,1));
 
   G4double CEE_TPC_sx = 80*cm;
@@ -80,7 +83,7 @@ G4VPhysicalVolume* T1DetectorConstruction::Construct()
   G4double CEE_TPC_py = 0*cm;
   G4double CEE_TPC_pz = 60*cm;
   G4ThreeVector CEE_TPC_p = G4ThreeVector(CEE_TPC_px, CEE_TPC_py, CEE_TPC_pz);
-  G4Material* CEE_TPC_mat = nist->FindOrBuildMaterial("G4_Galactic");//Ar:CH4 9:1
+  G4Material* CEE_TPC_mat = nist->FindOrBuildMaterial("CEEArCH4");//Ar:CH4 9:1
   G4VisAttributes* CEE_TPC_Vis = new G4VisAttributes(G4Colour(0.0,0.0,1.0,0.5));
 
 
