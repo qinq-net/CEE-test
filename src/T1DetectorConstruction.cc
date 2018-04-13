@@ -25,6 +25,12 @@
 
 #include "T1T0.hh"
 
+#include <G4SDManager.hh>
+
+#include "PixDetector.hh"
+#include "TPCDetector.hh"
+#include "t1t0Detector.hh"
+
 using namespace std;
 
 
@@ -38,7 +44,11 @@ T1DetectorConstruction::T1DetectorConstruction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 T1DetectorConstruction::~T1DetectorConstruction()
-{ }
+{
+	PixDetectorLVs.clear();
+	TPCDetectorLVs.clear();
+	t1t0DetectorLVs.clear();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -236,8 +246,47 @@ new G4PVPlacement(0,                     //no rotation
 testlogic -> SetVisAttributes(CEE_TPC_Vis);
 */
 
+  this->PixDetectorLVs.push_back(CEE_Pix_logic);
+  this->TPCDetectorLVs.push_back(CEE_TPC_logic);
+  this->t1t0DetectorLVs.push_back(ceeT1T0.logicT0);
   //
   //always return the physical World
   //
   return CEE_world_phys;
+}
+
+void T1DetectorConstruction::ConstructSDandField()
+{
+  this->SetupDetectors();
+}
+
+void T1DetectorConstruction::SetupDetectors()
+{
+	// sensitive detectors
+	G4SDManager::GetSDMpointer()->SetVerboseLevel(2);
+	for(auto it: PixDetectorLVs)
+	{
+		G4String detName = it->GetName() + "_det";
+		G4int depth=0;
+		PixDetector* det = new PixDetector(detName,depth);
+		G4SDManager::GetSDMpointer()->AddNewDetector(det);
+		it->SetSensitiveDetector(det);
+	}
+	for (auto it: TPCDetectorLVs)
+	{
+		G4String detName = it->GetName() + "_det";
+		G4int depth=0;
+		TPCDetector* det = new TPCDetector(detName,depth);
+		G4SDManager::GetSDMpointer()->AddNewDetector(det);
+		it->SetSensitiveDetector(det);
+	}
+	for (auto it: t1t0DetectorLVs)
+	{
+		G4String detName = it->GetName() + "_det";
+		G4int depth=0;
+		t1t0Detector* det = new t1t0Detector(detName,depth);
+		G4SDManager::GetSDMpointer()->AddNewDetector(det);
+		it->SetSensitiveDetector(det);
+	}
+	G4cerr<<"--> SDManager has " << G4SDManager::GetSDMpointer()->GetCollectionCapacity() << " collections after construction." << G4endl;
 }
