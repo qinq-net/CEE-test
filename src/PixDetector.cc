@@ -10,6 +10,8 @@
 #include <G4PSTrackLength.hh>
 #include <G4PSNofStep.hh>
 
+#include "CEEPSStartTime.hh"
+
 PixDetector::PixDetector(G4String name, G4int depth=0) : G4MultiFunctionalDetector(name)
 {
 	G4String filterName, particleName;
@@ -62,6 +64,8 @@ PixDetector::PixDetector(G4String name, G4int depth=0) : G4MultiFunctionalDetect
 	primitive->SetFilter(epFilter);
 	this->RegisterPrimitive(primitive);
 	*/
+	primitive = new CEEPSStartTime("sTime",depth);
+	this->RegisterPrimitive(primitive);
 
 }
 
