@@ -80,7 +80,8 @@ void T1EventAction::EndOfEventAction(const G4Event* evt)
 				evtOut 	<< " >   copy no.: " << copyItr.first << std::endl;
 				for(auto trackItr: *copyItr.second)
 				{
-					evtOut 	<< " >> TID=" << trackItr->trackID
+					evtOut 	<< " >> sID=" << trackItr->stepID
+						<< " tID=" << trackItr->trackID
 						<< " t=" << trackItr->time/ns
 						<< "ns x=" << trackItr->position.x()/mm
 						<< "mm y=" << trackItr->position.y()/mm
