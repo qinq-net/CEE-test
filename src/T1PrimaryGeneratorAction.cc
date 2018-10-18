@@ -8,6 +8,7 @@
 #include "G4ParticleDefinition.hh"
 #include "G4ChargedGeantino.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4Run.hh"
 #include "Randomize.hh"
 
 extern G4double energy; //dai danwei
@@ -56,9 +57,16 @@ void T1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticleCharge(ionCharge);
   }
 
-  G4double x0 = 0.*mm; //1.*mm * (G4UniformRand()-0.5);
-  G4double y0 = 0.*mm; //1.*mm * (G4UniformRand()-0.5);
+  G4double energyChanged = energy * G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+  fParticleGun->SetParticleEnergy(energyChanged);
+  G4double x0 = 1.*mm * (G4UniformRand()-0.5);
+  G4double y0 = 1.*mm * (G4UniformRand()-0.5);
   G4double z0 = -800.*mm;
+  G4cerr << "Run: " << G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID() << 
+            " Energy: " << energyChanged/MeV << "MeV" <<
+            " X0: " << x0/mm << "mm" <<
+            " Y0: " << y0/mm << "mm" << G4endl;
+
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
 
