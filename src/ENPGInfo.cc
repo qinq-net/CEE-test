@@ -11,5 +11,5 @@ ENPGInfo::~ENPGInfo()
 
 void ENPGInfo::Print() const
 {
-	G4cout << this->str << G4endl;
+	G4cout << this->str;
 }

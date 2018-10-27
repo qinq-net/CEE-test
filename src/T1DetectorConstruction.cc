@@ -69,7 +69,7 @@ G4VPhysicalVolume* T1DetectorConstruction::Construct()
   G4double CEE_world_sy = 5*m;  //gao
   G4double CEE_world_sz = 15*m;  //chang  zhouxiang
   G4ThreeVector CEE_world_p = G4ThreeVector(0*cm, 0*cm, 0*cm);
-  G4Material* CEE_world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* CEE_world_mat = nist->FindOrBuildMaterial("G4_Galactic");
   G4VisAttributes* CEE_world_Vis = new G4VisAttributes(G4Colour(0.0,0.0,0.0,0.0));
 
 /*

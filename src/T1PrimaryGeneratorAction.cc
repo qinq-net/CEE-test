@@ -47,9 +47,8 @@ T1PrimaryGeneratorAction::~T1PrimaryGeneratorAction()
 void T1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
-  if (particle == G4ChargedGeantino::ChargedGeantino()) {
-    //C12
-    G4int Z = 6, A = 12;
+  //if (particle == G4ChargedGeantino::ChargedGeantino()) {
+    G4int Z = 2, A = 4;//H
     G4double ionCharge   = 6.*eplus;
     G4double excitEnergy = 0.*keV;
 
@@ -57,24 +56,34 @@ void T1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
        = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
     fParticleGun->SetParticleDefinition(ion);
     fParticleGun->SetParticleCharge(ionCharge);
-  }
+  //}
 std::cerr << "Generating Primaries" << std::endl;
-  G4double energyChanged = energy * anEvent->GetEventID();
+  G4double energyChanged = energy * (anEvent->GetEventID()/10+1) ;
   fParticleGun->SetParticleEnergy(energyChanged);
   G4double x0 = 1.*mm * (G4UniformRand()-0.5);
   G4double y0 = 1.*mm * (G4UniformRand()-0.5);
   G4double z0 = -800.*mm;
-  std::stringstream infoss;
-  infoss << "Energy: " << energyChanged/MeV << "MeV" <<
-            " X0: " << x0/mm << "mm" <<
-            " Y0: " << y0/mm << "mm" << std::endl;
-std::cerr << infoss.str() << std::endl;
-
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+
+  std::stringstream infoss1, infoss2;
+  infoss1 << "EventID:" << anEvent->GetEventID() <<
+            " Energy: " << energyChanged/MeV << "MeV" <<
+            " X0: " << x0/mm << "mm" <<
+            " Y0: " << y0/mm << "mm" <<
+	    " Z: " << Z <<
+	    " A: " << A << std::endl;
+std::cerr << infoss1.str() << std::endl;
+  infoss2 << anEvent->GetEventID() << '\t' //EventID
+          << x0/mm << '\t' //X0
+          << y0/mm << '\t' //Y0
+	  << Z << '\t' //Z
+	  << A << '\t' // A
+          << energyChanged/MeV;//Energy
+  ENPGInfo* info = new ENPGInfo(infoss2.str());
+  anEvent->SetUserInformation(info);
+
 
   //create vertex
   fParticleGun->GeneratePrimaryVertex(anEvent);
-  ENPGInfo* info = new ENPGInfo(infoss.str());
-  anEvent->SetUserInformation(info);
   
 }

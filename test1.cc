@@ -18,7 +18,7 @@
 #include "G4SystemOfUnits.hh"
 
 
-G4double energy = 250*MeV;//T1PrimaryGeneratorAction.cc
+G4double energy = 1.*MeV;//T1PrimaryGeneratorAction.cc
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

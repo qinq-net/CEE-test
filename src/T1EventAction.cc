@@ -10,7 +10,9 @@
 #include "CEEEventLoggingSession.hh"
 #include <G4UImanager.hh>
 #include <G4THitsMap.hh>
+#include <G4HCofThisEvent.hh>
 #include <G4MultiFunctionalDetector.hh>
+#include <G4SystemOfUnits.hh>
 
 #include <fstream>
 #include "G4VUserPrimaryVertexInformation.hh"
@@ -61,9 +63,11 @@ void T1EventAction::EndOfEventAction(const G4Event* evt)
 	G4cout << " >>> End of Event " << evt->GetEventID() << G4endl;
 	{ //SD record
 		G4SDManager* SDMan = G4SDManager::GetSDMpointer();
+		G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
 		if(!SDMan) { G4cerr << "No SDManager!" << G4endl;}
 		else
 		{
+		/*
 			G4String outFileName = "results/Event" + std::to_string(evt->GetEventID()) + "Out.txt";
 			G4String errFileName = "results/Event" + std::to_string(evt->GetEventID()) + "Err.txt";
 			
@@ -82,6 +86,27 @@ void T1EventAction::EndOfEventAction(const G4Event* evt)
 			PrintMultiPrimitive<G4MultiFunctionalDetector>(detSSD);
 			G4MultiFunctionalDetector* detCsI = dynamic_cast<G4MultiFunctionalDetector*>(SDMan->FindSensitiveDetector("ENPG_CsI_det"));
 			PrintMultiPrimitive<G4MultiFunctionalDetector>(detCsI);
+			*/
+			G4String outFileName = "results.txt";
+			G4String errFileName = "errors.txt";
+			G4cout << "Relocating G4cout to file: " << outFileName << G4endl;
+			CEEEventLoggingSession* session = new CEEEventLoggingSession(
+				outFileName, errFileName);
+			G4UImanager* UI=G4UImanager::GetUIpointer();
+			G4UIsession* oldSession = UI->GetSession();
+			if(UI) UI->SetCoutDestination(session);
+			// G4cout has been relocated.
+			if(evt->GetUserInformation()) evt->GetUserInformation()->Print();
+			G4int colIDSSD=SDMan->GetCollectionID("ENPG_SSD_det/eDep");
+			G4int colIDCsI=SDMan->GetCollectionID("ENPG_CsI_det/eDep");
+			std::cerr << colIDSSD << colIDCsI << std::endl;
+			auto SSDMap = ((G4THitsMap<G4double>*)HCE->GetHC(colIDSSD))->GetMap();
+			auto CsIMap = ((G4THitsMap<G4double>*)HCE->GetHC(colIDCsI))->GetMap();
+			G4double DeltaE=0.,E=0.;
+			if(SSDMap && (*SSDMap)[0]) DeltaE=*((*SSDMap)[0]);
+			if(CsIMap && (*CsIMap)[0])      E=*((*CsIMap)[0]);
+			G4cout << '\t' << DeltaE/MeV << '\t' << E/MeV << G4endl;
+
 /*
 			{ //TPC
 				T1TPCDigi* tpcDigi = dynamic_cast<T1TPCDigi*>(SDMan->FindSensitiveDetector("CEE_TPC_logic_det"));

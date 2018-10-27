@@ -4,7 +4,7 @@ CEEEventLoggingSession::CEEEventLoggingSession(G4String coutFile_p, G4String cer
 {
 	this->coutFile=coutFile_p;
 	this->cerrFile=cerrFile_p;
-	coutStream.open(coutFile, std::ofstream::out|std::ofstream::trunc);
+	coutStream.open(coutFile, std::ofstream::out|std::ofstream::app);
 	cerrStream.open(cerrFile, std::ofstream::out|std::ofstream::app);
 }
 
