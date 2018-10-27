@@ -10,6 +10,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Run.hh"
 #include "Randomize.hh"
+#include "ENPGInfo.hh"
+#include <sstream>
 
 extern G4double energy; //dai danwei
 
@@ -56,20 +58,23 @@ void T1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->SetParticleDefinition(ion);
     fParticleGun->SetParticleCharge(ionCharge);
   }
-
-  G4double energyChanged = energy * G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+std::cerr << "Generating Primaries" << std::endl;
+  G4double energyChanged = energy * anEvent->GetEventID();
   fParticleGun->SetParticleEnergy(energyChanged);
   G4double x0 = 1.*mm * (G4UniformRand()-0.5);
   G4double y0 = 1.*mm * (G4UniformRand()-0.5);
   G4double z0 = -800.*mm;
-  G4cerr << "Run: " << G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID() << 
-            " Energy: " << energyChanged/MeV << "MeV" <<
+  std::stringstream infoss;
+  infoss << "Energy: " << energyChanged/MeV << "MeV" <<
             " X0: " << x0/mm << "mm" <<
-            " Y0: " << y0/mm << "mm" << G4endl;
-
+            " Y0: " << y0/mm << "mm" << std::endl;
+std::cerr << infoss.str() << std::endl;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
 
   //create vertex
   fParticleGun->GeneratePrimaryVertex(anEvent);
+  ENPGInfo* info = new ENPGInfo(infoss.str());
+  anEvent->SetUserInformation(info);
+  
 }

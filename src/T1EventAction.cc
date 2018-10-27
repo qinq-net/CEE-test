@@ -7,14 +7,13 @@
 
 #include <G4SDManager.hh>
 #include <G4VPrimitiveScorer.hh>
-#include "T1TPCDigi.hh"
-#include "T1MWDCDigi.hh"
 #include "CEEEventLoggingSession.hh"
 #include <G4UImanager.hh>
 #include <G4THitsMap.hh>
-#include "T1MRPCDigi.hh"
+#include <G4MultiFunctionalDetector.hh>
 
 #include <fstream>
+#include "G4VUserPrimaryVertexInformation.hh"
 using namespace std;
 //extern ofstream shuchu;
 
@@ -77,7 +76,13 @@ void T1EventAction::EndOfEventAction(const G4Event* evt)
 			// G4cout has been relocated.
 			G4cout << "### Event " << evt->GetEventID() << G4endl;
 			G4cout << "# vim: set foldmethod=marker :" << G4endl;
+			if(evt->GetUserInformation()) evt->GetUserInformation()->Print();
 
+			G4MultiFunctionalDetector* detSSD = dynamic_cast<G4MultiFunctionalDetector*>(SDMan->FindSensitiveDetector("ENPG_SSD_det"));
+			PrintMultiPrimitive<G4MultiFunctionalDetector>(detSSD);
+			G4MultiFunctionalDetector* detCsI = dynamic_cast<G4MultiFunctionalDetector*>(SDMan->FindSensitiveDetector("ENPG_CsI_det"));
+			PrintMultiPrimitive<G4MultiFunctionalDetector>(detCsI);
+/*
 			{ //TPC
 				T1TPCDigi* tpcDigi = dynamic_cast<T1TPCDigi*>(SDMan->FindSensitiveDetector("CEE_TPC_logic_det"));
 				PrintMultiPrimitive<T1TPCDigi>(tpcDigi);
@@ -104,6 +109,7 @@ void T1EventAction::EndOfEventAction(const G4Event* evt)
 				PrintMultiPrimitive<T1MRPCDigi>(dynamic_cast<T1MRPCDigi*>(SDMan->FindSensitiveDetector("CEE_6T1eTOF1_det")));
 				PrintMultiPrimitive<T1MRPCDigi>(dynamic_cast<T1MRPCDigi*>(SDMan->FindSensitiveDetector("CEE_6T1eTOF2_det")));
 			}
+*/
 			// relocating G4cout back to screen
 			if(UI) UI->SetCoutDestination(oldSession);
 			delete session;

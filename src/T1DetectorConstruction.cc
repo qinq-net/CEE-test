@@ -23,18 +23,8 @@
 
 
 
-#include "T1T0.hh"
-#include "T1TPC.hh"
-#include "T1iTOF.hh"
-#include "T1eTOF.hh"
-#include "T1ZDC.hh"
-#include "T1MWDC.hh"
-
 // Sensitive detectors
 #include <G4SDManager.hh>
-#include "T1TPCDigi.hh"
-#include "T1MWDCDigi.hh"
-#include "T1MRPCDigi.hh"
 #include <G4MultiFunctionalDetector.hh>
 #include <G4PSEnergyDeposit.hh>
 // Electromagnetic field
@@ -58,9 +48,6 @@ T1DetectorConstruction::T1DetectorConstruction()
 
 T1DetectorConstruction::~T1DetectorConstruction()
 {
-	delete CEE_TPC;
-	delete CEE_MWDC;
-	delete CEE_ZDC;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -143,184 +130,46 @@ G4VPhysicalVolume* T1DetectorConstruction::Construct()
                       0,                     //copy number
                       checkOverlaps);        //overlaps checking
   CEE_world_logic -> SetVisAttributes(CEE_world_Vis);
-//
-/*
-// CEE_Pix
-//
 
-G4Box* CEE_Pix_solid =
-  new G4Box("CEE_Pix_solid",                       //its name
-     0.5*CEE_Pix_sx, 0.5*CEE_Pix_sy, 0.5*CEE_Pix_sz);     //its size
+  G4double ENPG_SSD_Size[3]={10.*cm, 10.*cm, 1540.*um};//x,y,z
+  G4ThreeVector ENPG_SSD_position = G4ThreeVector(0.*cm, 0.*cm, 0.*cm);
 
-G4LogicalVolume* CEE_Pix_logic =
-  new G4LogicalVolume(CEE_Pix_solid,          //its solid
-                      CEE_Pix_mat,           //its material
-                      "CEE_Pix_logic");            //its name
-
-
-  new G4PVPlacement(0,                     //no rotation
-                    CEE_Pix_p,       //at (,,)
-                    CEE_Pix_logic,            //its logical volume
-                    "CEE_Pix_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-CEE_Pix_logic -> SetVisAttributes(CEE_Pix_Vis);
-*/
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_T0
-//
+  G4Box* ENPG_SSD_solid = 
+    new G4Box("ENPG_SSD_solid",
+        ENPG_SSD_Size[0],ENPG_SSD_Size[1],ENPG_SSD_Size[2]);
+  G4Material* ENPG_SSD_material = nist->FindOrBuildMaterial("G4_Si");
+  ENPG_SSD_logic = 
+    new G4LogicalVolume(ENPG_SSD_solid,
+                        ENPG_SSD_material,
+                        "ENPG_SSD_logic");
+  G4VPhysicalVolume* ENPG_SSD_phys =
+    new G4PVPlacement(0,
+                      ENPG_SSD_position,
+                      ENPG_SSD_logic,
+                      "ENPG_SSD_phys",
+                      CEE_world_logic,
+                      false, 0, checkOverlaps);
 
 
-  CEE_T0 = new T1T0();
-  new G4PVPlacement(CEE_T0->transT0,
-                    CEE_T0->logicT0,            //its logical volume
-                    "CEE_T0_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
+  G4double ENPG_CsI_Size[3]={10.*cm, 10.*cm, 50.*mm};
+  G4ThreeVector ENPG_CsI_position = G4ThreeVector(0.*cm, 0.*cm, ENPG_SSD_position.z() + 5.*mm + (ENPG_SSD_Size[2]+ENPG_CsI_Size[2]));
+  
+  G4Box* ENPG_CsI_solid = 
+    new G4Box("ENPG_CsI_solid",
+        ENPG_CsI_Size[0], ENPG_CsI_Size[1], ENPG_CsI_Size[2]);
+  G4Material* ENPG_CsI_material = nist->FindOrBuildMaterial("G4_SODIUM_IODIDE");
+  ENPG_CsI_logic =
+    new G4LogicalVolume(ENPG_CsI_solid,
+                        ENPG_CsI_material,
+                        "ENPG_CsI_material");
+  G4VPhysicalVolume* ENPG_CsI_phys =
+    new G4PVPlacement(0,
+                      ENPG_CsI_position,
+                      ENPG_CsI_logic,
+                      "ENPG_CsI_phys",
+                      CEE_world_logic,
+                      false, 0, checkOverlaps);
 
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_TPC
-//
-  CEE_TPC = new T1TPC();
-  new G4PVPlacement(CEE_TPC->transTPC,
-                    CEE_TPC->logicTPC,            //its logical volume
-                    "CEE_TPC_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_iTOF
-//
-
-  CEE_iTOF = new T1iTOF();
-  new G4PVPlacement(CEE_iTOF->transiTOF[0],
-                    CEE_iTOF->logiciTOF[0],            //its logical volume
-                    "CEE_iTOF1_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-  //
-  new G4PVPlacement(CEE_iTOF->transiTOF[1],
-                    CEE_iTOF->logiciTOF[1],            //its logical volume
-                    "CEE_iTOF2_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_eTOF
-//
-  CEE_eTOF = new T1eTOF();
-  new G4PVPlacement(CEE_eTOF->transeTOF[0],
-                    CEE_eTOF->logiceTOF[0],            //its logical volume
-                    "CEE_eTOF1_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-  //
-  new G4PVPlacement(CEE_eTOF->transeTOF[1],
-                    CEE_eTOF->logiceTOF[1],            //its logical volume
-                    "CEE_eTOF2_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_ZDC
-//
-  CEE_ZDC=new T1ZDC();
-  new G4PVPlacement(CEE_ZDC->transZDC,
-                    CEE_ZDC->logicZDC,            //its logical volume
-                    "CEE_ZDC_phys",               //its name
-                    CEE_world_logic,                     //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// CEE_MWDC
-//
-  CEE_MWDC=new T1MWDC();
-  for(int id=1;id<=6;id++){
-    new G4PVPlacement(CEE_MWDC->transMWDC[id-1],
-                      CEE_MWDC->logicMWDC[id-1],            //its logical volume
-                      "CEE_MWDC"+to_string(id)+"_phys",               //its name
-                      CEE_world_logic,                     //its mother  volume
-                      false,                 //no boolean operation
-                      0,                     //copy number
-                      checkOverlaps);        //overlaps checking
-  }
-//////////////////////////////////////////////////////////////////////////////
-/*
-
-G4Box*  box =
-  new G4Box("Box",1*m,2*m,3*m);
-G4Tubs* cyl =
-  new G4Tubs("Cylinder",0,20*cm,3*m,0,twopi);  // r:     0 mm -> 50 mm
-                                                 // z:   -50 mm -> 50 mm
-                                                 // phi:   0 ->  2 pi
-
-
-G4RotationMatrix* yRot = new G4RotationMatrix;  // Rotates X and Z axes only
-yRot->rotateY(pi/6.*rad);                     // Rotates 45 degrees
-yRot->rotateZ(pi/4.*rad);
-G4ThreeVector zTrans(0, 0, 2*m);
-*/
-  /*
-G4UnionSolid* unionMoved =
-  new G4UnionSolid("Box+CylinderMoved", box, cyl, yRot, zTrans);
-  */
- //
- // The new coordinate system of the cylinder is translated so that
- // its centre is at +50 on the original Z axis, and it is rotated
- // with its X axis halfway between the original X and Z axes.
-
- // Now we build the same solid using the alternative method
- //
-/*
- //G4RotationMatrix invRot = *yRot;//->invert();
-G4Transform3D transform(*yRot, zTrans);
-G4UnionSolid* unionMoved =
-  new G4UnionSolid("Box+CylinderMoved", box, cyl, transform);
-
-
-G4LogicalVolume* testlogic =
-  new G4LogicalVolume(unionMoved,          //its solid
-                      CEE_TPC_mat,           //its material
-                      "CEE_testlogic");            //its name
-
-new G4PVPlacement(0,                     //no rotation
-                  G4ThreeVector(0,0,0),       //at (,,)
-                  testlogic,            //its logical volume
-                  "CEE_testphys",               //its name
-                  CEE_world_logic,                     //its mother  volume
-                  false,                 //no boolean operation
-                  0,                     //copy number
-                  checkOverlaps);        //overlaps checking
-testlogic -> SetVisAttributes(CEE_TPC_Vis);
-*/
 
   //
   //always return the physical World
@@ -333,7 +182,7 @@ void T1DetectorConstruction::ConstructSDandField()
 	this->SetupDetectors();
 	this->SetupField();
 }
-
+/*
 template<typename Geom_t, typename Digi_t> G4bool MRPCSetup(Geom_t* Geometry, G4int number, CEEMRPCDirection direction, G4int depth=1)
 {
 	for(G4int i=1; i<=number; i++)
@@ -360,11 +209,23 @@ template<typename Geom_t, typename Digi_t> G4bool MRPCSetup(Geom_t* Geometry, G4
 		}
 	}
 }
-
+*/
 void T1DetectorConstruction::SetupDetectors()
 {
 	// sensitive detectors
 	G4SDManager::GetSDMpointer()->SetVerboseLevel(2);
+        G4MultiFunctionalDetector* ENPG_SSD_det = new G4MultiFunctionalDetector("ENPG_SSD_det");
+        G4PSEnergyDeposit* ENPG_SSD_energy = new G4PSEnergyDeposit("eDep", "MeV", 1);
+        ENPG_SSD_det->RegisterPrimitive(ENPG_SSD_energy);
+        G4SDManager::GetSDMpointer()->AddNewDetector(ENPG_SSD_det);
+        ENPG_SSD_logic->SetSensitiveDetector(ENPG_SSD_det);
+        G4MultiFunctionalDetector* ENPG_CsI_det = new G4MultiFunctionalDetector("ENPG_CsI_det");
+        G4PSEnergyDeposit* ENPG_CsI_energy = new G4PSEnergyDeposit("eDep", "MeV", 1);
+        ENPG_CsI_det->RegisterPrimitive(ENPG_CsI_energy);
+        G4SDManager::GetSDMpointer()->AddNewDetector(ENPG_CsI_det);
+        ENPG_CsI_logic->SetSensitiveDetector(ENPG_CsI_det);
+
+        /*
 	// TPC
 	{
 		G4String detName = CEE_TPC->logicTPC->GetName() + "_det";
@@ -415,13 +276,12 @@ void T1DetectorConstruction::SetupDetectors()
 	{
 		G4int depth=1;
 		// T0
-		/* MRPCSetup<T1T0, T1MRPCDigi>(CEE_T0, 1, depth);
-		 */
 		// iTOF
 		MRPCSetup<T1iTOF, T1MRPCDigi>(CEE_iTOF, 2, CEEMRPCDirection::Z, depth);
 		// eTOF
 		MRPCSetup<T1eTOF, T1MRPCDigi>(CEE_eTOF, 2, CEEMRPCDirection::Y, depth);
 	}
+        */
 }
 
 void T1DetectorConstruction::SetupField()
